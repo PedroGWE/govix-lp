@@ -5,6 +5,7 @@ services:
     image: ghcr.io/pedrogwe/govix-lp:latest
     networks:
       - mandatto
+      - Vidrofy
     deploy:
       replicas: 1
       restart_policy:
@@ -13,23 +14,23 @@ services:
         - "traefik.enable=true"
 
         # Governanc LP — www.governanc.com.br
-        - "traefik.http.routers.govix-lp.rule=Host(`www.governanc.com.br`) || Host(`governanc.com.br`)"
+        - "traefik.http.routers.govix-lp.rule=Host(`www.governanc.com.br`)"
         - "traefik.http.routers.govix-lp.entrypoints=websecure"
         - "traefik.http.routers.govix-lp.tls=true"
         - "traefik.http.routers.govix-lp.tls.certresolver=letsencryptresolver"
         - "traefik.http.services.govix-lp.loadbalancer.server.port=80"
 
-        # Redirect governanc.com.br → www.governanc.com.br
-        - "traefik.http.routers.govix-lp-redirect.rule=Host(`governanc.com.br`)"
-        - "traefik.http.routers.govix-lp-redirect.entrypoints=websecure"
-        - "traefik.http.routers.govix-lp-redirect.tls=true"
-        - "traefik.http.routers.govix-lp-redirect.tls.certresolver=letsencryptresolver"
-        - "traefik.http.routers.govix-lp-redirect.middlewares=govix-lp-www"
-        - "traefik.http.middlewares.govix-lp-www.redirectregex.regex=^https://governanc\\.com\\.br/(.*)"
-        - "traefik.http.middlewares.govix-lp-www.redirectregex.replacement=https://www.governanc.com.br/$${1}"
-        - "traefik.http.middlewares.govix-lp-www.redirectregex.permanent=true"
+        # Governanc LP — governanc.com.br (sem www)
+        - "traefik.http.routers.govix-lp-apex.rule=Host(`governanc.com.br`)"
+        - "traefik.http.routers.govix-lp-apex.entrypoints=websecure"
+        - "traefik.http.routers.govix-lp-apex.tls=true"
+        - "traefik.http.routers.govix-lp-apex.tls.certresolver=letsencryptresolver"
+        - "traefik.http.routers.govix-lp-apex.service=govix-lp"
 
 networks:
   mandatto:
     external: true
     name: mandatto
+  Vidrofy:
+    external: true
+    name: Vidrofy
